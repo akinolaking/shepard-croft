@@ -4,12 +4,14 @@ import {readFileSync} from 'node:fs';
 const css=readFileSync(new URL('../src/styles.css',import.meta.url),'utf8');
 const figmaCss=readFileSync(new URL('../src/figma-home.css',import.meta.url),'utf8');
 
-test('QA: form field radius, dark label ink and consistent Astryx inputs are defined',()=>{
+test('QA: Astryx text input uses one bordered shell and a transparent inner control',()=>{
  assert.match(css,/--sc-field-radius:\s*8px/);
  assert.match(css,/--sc-field-ink:\s*#183a2d/);
- assert.match(css,/form-card\s+\.field\s+:where\(input:not\(\[type="checkbox"\]\)/);
- assert.match(css,/border-radius:var\(--sc-field-radius\)/);
- assert.match(css,/form-card\s+\.field\s+:where\(label/);
+ assert.match(css,/\.sc-astryx-input-shell input \{/);
+ assert.match(css,/border-width:0 !important/);
+ assert.match(css,/background:transparent !important/);
+ assert.match(css,/\.sc-astryx-input-shell:focus-within/);
+ assert.match(css,/\.form-page \.form-card \.field \.sc-native-control/);
 });
 test('QA: light editorial surfaces enforce dark headings, dark panels retain white',()=>{
  assert.match(figmaCss,/\.figma-site \.fh-first :is\(h1,h2,h3\)/);

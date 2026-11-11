@@ -54,7 +54,8 @@ async function run(){
       if(ratio<4.5)textAlerts.push({tag:el.tagName,text:el.textContent.trim().slice(0,64),ratio:Number(ratio.toFixed(2)),fg:getComputedStyle(el).color,bg:b.join(',')});
      }
      const controls=Array.from(document.querySelectorAll('.form-card input:not([type=radio]):not([type=checkbox]),.form-card textarea,.form-card select')).filter(seen).map(el=>{
-      const cs=getComputedStyle(el);return {tag:el.tagName,type:el.getAttribute('type')||'text',radius:cs.borderRadius,height:Math.round(el.getBoundingClientRect().height),color:cs.color,border:cs.borderColor};
+      const cs=getComputedStyle(el),shell=el.closest('.sc-astryx-input-shell'),outer=shell?getComputedStyle(shell):null;
+      return {tag:el.tagName,type:el.getAttribute('type')||'text',kind:shell?'astryx':'native',radius:cs.borderRadius,height:Math.round(el.getBoundingClientRect().height),color:cs.color,border:cs.borderColor,borderWidth:cs.borderWidth,background:cs.backgroundColor,padding:cs.padding,shellRadius:outer?.borderRadius||null,shellHeight:shell?Math.round(shell.getBoundingClientRect().height):null};
      });
      return {
       h1:Array.from(document.querySelectorAll('h1')).map(el=>el.textContent.trim()),
@@ -81,8 +82,11 @@ async function run(){
    await sheet.screenshot({path:path.join(output,`Shepard-Croft-${viewport.name}-4x4.png`),fullPage:true});
    await sheet.close();
   }
-  const fail=records.filter(r=>r.errors.length||r.missingImages.length||r.overflow>1||r.textAlerts.length||r.controls.some(c=>parseFloat(c.radius)<6||c.height<44));
-  fs.writeFileSync(path.join(output,'summary.json'),JSON.stringify({routes:routes.length,viewports:viewports.map(v=>v.name),totalChecks:records.length,failed:fail.length,failures:fail.map(x=>({viewport:x.viewport,route:x.route,errors:x.errors,text:x.textAlerts,controls:x.controls.filter(c=>parseFloat(c.radius)<6||c.height<44)}))},null,2));
+  const brokenControl=c=>c.kind==='astryx'
+   ? (parseFloat(c.shellRadius)<6 || c.shellHeight<48 || parseFloat(c.borderWidth)>0 || parseFloat(c.padding)>0 || !(/transparent|rgba\(0, 0, 0, 0\)/.test(c.background)))
+   : (parseFloat(c.radius)<6 || c.height<44);
+  const fail=records.filter(r=>r.errors.length||r.missingImages.length||r.overflow>1||r.textAlerts.length||r.controls.some(brokenControl));
+  fs.writeFileSync(path.join(output,'summary.json'),JSON.stringify({routes:routes.length,viewports:viewports.map(v=>v.name),totalChecks:records.length,failed:fail.length,failures:fail.map(x=>({viewport:x.viewport,route:x.route,errors:x.errors,text:x.textAlerts,controls:x.controls.filter(brokenControl)}))},null,2));
   if(fail.length){console.error('Visual QA failure on '+fail.length+' route/viewport cases; see qa/summary.json');process.exitCode=1;}
   else console.log(`Visual QA passed: ${records.length} route/viewports. Evidence in ${output}`);
  } finally {await browser?.close();server.kill('SIGTERM');}

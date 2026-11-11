@@ -335,10 +335,11 @@ p {color:#4e5d53;}
   color:var(--sc-field-ink);
   opacity:1;
 }
-.form-card .field :where(input:not([type="checkbox"]):not([type="radio"]), textarea, select) {
+/* Native fields receive their own border; Astryx TextInput owns its wrapper border. */
+.form-card .field .sc-native-control {
   box-sizing:border-box;
   width:100%;
-  min-height:50px;
+  min-height:52px;
   color:var(--sc-field-ink);
   -webkit-text-fill-color:var(--sc-field-ink);
   background:#fff;
@@ -361,11 +362,17 @@ p {color:#4e5d53;}
   outline:3px solid #bed8c5;
   outline-offset:1px;
 }
-/* Astryx typically rounds its TextInput shell. Ensure the nested input has
-   matching corners so the inner white rectangle does not appear square. */
-.form-card .field :is([class*="InputRoot"],[class*="inputRoot"],[class*="inputContainer"],[class*="InputContainer"],[data-slot="input-wrapper"]) {
+/* Apply radius to the actual Astryx control wrapper, not the transparent input. */
+.form-page .form-card .field .sc-astryx-input-shell {
+  width:100%;
+  box-sizing:border-box;
+  min-height:52px;
+  padding:10px 14px;
+  border:1px solid var(--sc-field-border);
   border-radius:var(--sc-field-radius);
-  overflow:visible;
+  background:#fff;
+  display:flex;
+  align-items:center;
 }
 .form-card .field textarea {min-height:120px;resize:vertical;}
 .form-card .options label {border-radius:var(--sc-field-radius);color:var(--sc-field-ink);}
@@ -378,24 +385,45 @@ p {color:#4e5d53;}
   .btn,.service-card,.journey {transition:none;}
 }
 
-/* Browser-QA override: the original selector `.field input:not(...)` has more
-   specificity than a :where() wrapper. Target the real DOM input directly. */
-.form-page .form-card .field input:not([type="checkbox"]):not([type="radio"]),
-.form-page .form-card .field textarea,
-.form-page .form-card .field select {
-  border-radius:var(--sc-field-radius) !important;
+/* Astryx TextInput composition: its focusable wrapper owns borders, padding
+   and rounded corners; the inner input is intentionally transparent and
+   borderless. Do not draw a second rectangle inside the Astra design system. */
+.form-page .form-card .field .sc-astryx-input-shell input {
+  display:block;
+  width:100%;
+  flex:1;
+  min-width:0;
+  height:auto;
+  min-height:0 !important;
+  padding:0 !important;
+  margin:0;
+  border:0 !important;
+  border-width:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  outline:none !important;
+  box-shadow:none !important;
+  color:var(--sc-field-ink);
+  -webkit-text-fill-color:var(--sc-field-ink);
+  font:400 15px/1.4 var(--sc-sans);
+}
+.form-page .form-card .field .sc-astryx-input-shell:focus-within {
+  border-color:#315e46;
+  outline:3px solid #bed8c5;
+  outline-offset:1px;
+}
+/* Date/time/select and textarea have no Astryx TextInput shell. */
+.form-page .form-card .field .sc-native-control {
   min-height:52px;
-  border-color:var(--sc-field-border);
-  background-color:#fff;
+  border:1px solid var(--sc-field-border) !important;
+  border-radius:var(--sc-field-radius) !important;
+  background:#fff;
   color:var(--sc-field-ink);
   -webkit-text-fill-color:var(--sc-field-ink);
   padding:13px 15px;
 }
-.form-page .form-card .field :is(div, span):has(> input:not([type="checkbox"]):not([type="radio"])) {
-  border-radius:var(--sc-field-radius);
-}
-.form-page .form-card .field :is(input:not([type="checkbox"]):not([type="radio"]),textarea,select):focus-visible {
-  border-color:#315e46;
+.form-page .form-card .field .sc-native-control:focus-visible {
+  border-color:#315e46 !important;
   outline:3px solid #bed8c5;
   outline-offset:1px;
 }
