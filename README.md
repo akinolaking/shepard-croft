@@ -1,21 +1,15 @@
-# Shepard Croft
+# Shepard Croft — Astryx website v1.1.0 (work in progress)
 
-Source repository for the Shepard Croft website and booking integrations.
+Revised from the source HTML/React archives previously delivered for Shepard Croft. Uses actual `@astryxdesign/core` Theme, Button and TextInput primitives with bespoke Figma-matched layouts. The Figma export is the visual specification; do not replace its styling with an unrelated design.
 
-## Delivery guardrails
+## Routes
+`#/home`, `#/living`, `#/wealth`, `#/heritage`, `#/companion`, `#/transfer`, `#/accessible`, `#/grocery`, `#/grocery-form`, `#/vending`, `#/vending-form`, `#/contact`, `#/ready`.
 
-- Recreate the approved Shepard Croft Figma designs exactly. Do not substitute a new template or a generic frontend.
-- The React/Astryx website source from earlier preview work **has not yet been imported**. This repository does not presently contain an approved site or production deployment.
-- Vercel project: `shepard-croft` (existing, not yet deployed).
-- Neon PostgreSQL is the planned application-side data store for enquiries and coordination, not the source of truth for appointment availability.
-- VoxelBooking is a separate self-hosted PHP 8.3+/MySQL 8.0+ booking engine. Its bookings and availability remain authoritative; it cannot run inside Neon or on Vercel's Node runtime.
-- Never label an enquiry as a confirmed booking. Confirm only after a successful VoxelBooking operation.
-- Do not put database credentials, customer details, or care-related sensitive information in Git.
+## Run
+`npm ci` (after generating a lockfile in a network-enabled environment), `npm run dev`, `npm test`, `npm run build`. Note: this archive presently does not include a generated lockfile. Use `npm install` once and commit the lockfile before CI/deployment.
 
-## Work in progress
+## Status and privacy
+The React forms submit generic enquiries to `/api/booking-requests` and display success only after a 201 response. The API is disabled until database schema, privacy and abuse controls are reviewed. On failure, the user may explicitly open an email draft. The form does not claim a confirmed booking. VoxelBooking is not installed and requires separate PHP/MySQL hosting; see docs/booking-integration.md.
 
-A draft backend-only implementation is maintained on a feature branch for review. Deploying the website requires importing the approved React/Astryx frontend and verifying its Figma fidelity and booking flows.
-
-Reference documentation:
-- https://voxelbooking.com/docs/agent-api/transport-and-authentication
-- https://voxelbooking.com/docs/customization/embed
+## Test evidence
+`npm test` checks input mappings, data minimisation, validation, mocked storage and disabled/offline API outcomes. This is NOT a live Neon/VoxelBooking end-to-end test.
