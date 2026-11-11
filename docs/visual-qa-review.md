@@ -24,3 +24,6 @@ Home, Living, Wealth, Heritage, Companion request, Transfer quote, Accessible tr
 - The 4x4 contact sheets show 12 primary route first-fold captures plus 4 form-detail repeats; the ZIP also contains individual full-page snapshots from the HTML reference.
 - Visual testing of a development preview does not test real Neon submission or VoxelBooking booking calendar.
 - Production release remains blocked on genuine booking integration, privacy review, and Figma sign-off.
+
+## Automated screenshot audit finding, v1.3 first pass
+On the first GitHub Actions browser run (13 routes × 3 viewports = 39), there were **21 failures**, all on form screens where text inputs retained 2 px corners and 49 px height; headings/labels showed no sub-threshold contrast warnings and no route overflow or missing images. The cause was CSS specificity: the original `.field input:not(...)` selector outweighed the new low-specificity `:where()` declaration. An explicit `.form-page .form-card .field input:not(...)` override now sets 8 px corners and a minimum 52 px field height. This requires a second browser run before acceptance.

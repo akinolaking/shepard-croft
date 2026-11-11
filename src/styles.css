@@ -377,3 +377,25 @@ p {color:#4e5d53;}
 @media (prefers-reduced-motion: reduce){
   .btn,.service-card,.journey {transition:none;}
 }
+
+/* Browser-QA override: the original selector `.field input:not(...)` has more
+   specificity than a :where() wrapper. Target the real DOM input directly. */
+.form-page .form-card .field input:not([type="checkbox"]):not([type="radio"]),
+.form-page .form-card .field textarea,
+.form-page .form-card .field select {
+  border-radius:var(--sc-field-radius) !important;
+  min-height:52px;
+  border-color:var(--sc-field-border);
+  background-color:#fff;
+  color:var(--sc-field-ink);
+  -webkit-text-fill-color:var(--sc-field-ink);
+  padding:13px 15px;
+}
+.form-page .form-card .field :is(div, span):has(> input:not([type="checkbox"]):not([type="radio"])) {
+  border-radius:var(--sc-field-radius);
+}
+.form-page .form-card .field :is(input:not([type="checkbox"]):not([type="radio"]),textarea,select):focus-visible {
+  border-color:#315e46;
+  outline:3px solid #bed8c5;
+  outline-offset:1px;
+}
