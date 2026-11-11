@@ -1,10 +1,10 @@
-import groceryImage from './image-data/grocery';
-import airportvehicleImage from './image-data/airport-vehicle';
-import companionportraitImage from './image-data/companion-portrait';
-import vendingImage from './image-data/vending';
-import communityImage from './image-data/community';
-import companionshipImage from './image-data/companionship';
-import frontdoorImage from './image-data/front-door';
+const groceryImage='/images/grocery.webp';
+const airportvehicleImage='/images/airport-vehicle.webp';
+const companionportraitImage='/images/companion-portrait.webp';
+const vendingImage='/images/vending.webp';
+const communityImage='/images/community.webp';
+const companionshipImage='/images/companionship.webp';
+const frontdoorImage='/images/front-door.webp';
 import FigmaHome from './FigmaHome';
 import {buildEnquiryPayload, submitEnquiry} from './lib/enquiry-client.js';
 import {useEffect,useState} from 'react';
@@ -14,20 +14,20 @@ import {Button} from '@astryxdesign/core/Button';
 import {TextInput} from '@astryxdesign/core/TextInput';
 
 /**
- * Shepard Croft website — React 19 + actual Astryx 0.7.14 primitives.
+ * Shepard Croft website — React 19 + actual Astryx 0.7.4 primitives.
  * Project references: Figma-exported PDF/SVG supplied by the owner and
- * astryx-main.zip. This is a static front end: queries are only prepared as
- * email drafts. Connect a secure form endpoint before production launch.
+ * astryx-main.zip. Enquiry forms call a guarded server-only API. Booking creation requires the
+ * configured external VoxelBooking service and customer approval.
  */
 
-type Route = 'home'|'living'|'wealth'|'heritage'|'companion'|'transfer'|'accessible'|'grocery'|'grocery-form'|'vending'|'vending-form'|'contact'|'ready';
+type Route = 'book-companion'|'home'|'living'|'wealth'|'heritage'|'companion'|'transfer'|'accessible'|'grocery'|'grocery-form'|'vending'|'vending-form'|'contact'|'ready';
 type Draft = {subject:string;body:string;mode:'sent'|'draft';requestId?:string};
 const E='Hello@shepardcroft.com';
-const routeNames:Record<Route,string>={home:'Home',living:'Living & Well-Being',wealth:'Wealth & Infrastructure',heritage:'Heritage & Provisions',companion:'Companion request',transfer:'Airport transfer quote',accessible:'Accessible transport',grocery:'Grocery market', 'grocery-form':'Grocery market interest', vending:'Vending machines','vending-form':'Vending site visit',contact:'Contact',ready:'Enquiry draft'};
+const routeNames:Record<Route,string>={'book-companion':'Book a companion',home:'Home',living:'Living & Well-Being',wealth:'Wealth & Infrastructure',heritage:'Heritage & Provisions',companion:'Companion request',transfer:'Airport transfer quote',accessible:'Accessible transport',grocery:'Grocery market', 'grocery-form':'Grocery market interest', vending:'Vending machines','vending-form':'Vending site visit',contact:'Contact',ready:'Enquiry draft'};
 const routeList=Object.keys(routeNames) as Route[];
-const currentRoute=():Route=>{const value=location.hash.replace(/^#\/?/,'') as Route;return routeList.includes(value)?value:'home'};
-function go(route:Route){location.hash='#/'+route;}
-function Link({route,children,outline=false,className=''}:{route:Route;children:React.ReactNode;outline?:boolean;className?:string}){return <a className={`btn ${outline?'btn--outline':''} ${className}`} href={`#/${route}`}>{children}<span aria-hidden="true">→</span></a>}
+const currentRoute=():Route=>{const legacy=location.hash.match(/^#\/?([a-z-]+)$/);const value=(legacy?legacy[1]:location.pathname.replace(/^\/+|\/+$/g,'')) as Route;return routeList.includes(value)?value:'home'};
+function go(route:Route){history.pushState(null,'',route==='home'?'/':`/${route}/`);window.dispatchEvent(new PopStateEvent('popstate'));}
+function Link({route,children,outline=false,className=''}:{route:Route;children:React.ReactNode;outline?:boolean;className?:string}){return <a className={`btn ${outline?'btn--outline':''} ${className}`} href={route==='home'?'/':`/${route}/`}>{children}<span aria-hidden="true">→</span></a>}
 function Eyebrow({children}:{children:React.ReactNode}){return <div className="eyebrow">{children}</div>}
 const imageByName:Record<string,string>={'grocery':groceryImage,'airport-vehicle':airportvehicleImage,'companion-portrait':companionportraitImage,'vending':vendingImage,'community':communityImage,'companionship':companionshipImage,'front-door':frontdoorImage};
 function Image({name,alt}:{name:string;alt:string}){return <img src={imageByName[name]} alt={alt} loading="lazy"/>}
@@ -88,16 +88,16 @@ function Navigation({route}:{route:Route}){
  useEffect(()=>setOpen(false),[route]);
  const active=route==='companion'||route==='accessible'?'living':route==='transfer'?'wealth':route==='grocery'||route==='vending'||route==='vending-form'||route==='grocery-form'?'heritage':route;
  return <header className="topbar"><div className="container nav-inner">
-  <a className="brand" href="#/home">Shepard Croft<span>Here for your everyday</span></a>
-  <nav className="nav-links" aria-label="Main navigation">{(['living','wealth','heritage'] as Route[]).map(r=><a aria-current={active===r?'page':undefined} href={`#/${r}`} key={r}>{routeNames[r]}</a>)}</nav>
+  <a className="brand" href="/">Shepard Croft<span>Here for your everyday</span></a>
+  <nav className="nav-links" aria-label="Main navigation">{(['living','wealth','heritage'] as Route[]).map(r=><a aria-current={active===r?'page':undefined} href={`/${r}/`} key={r}>{routeNames[r]}</a>)}</nav>
   <Link route="contact" className="nav-cta">Talk to the team</Link>
   <button className="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded={open} onClick={()=>setOpen(v=>!v)}>☰</button>
- </div><nav className={'mobile-menu '+(open?'open':'')} aria-label="Mobile navigation">{(['living','wealth','heritage','companion','transfer','contact'] as Route[]).map(r=><a href={`#/${r}`} key={r}>{routeNames[r]}</a>)}</nav></header>;
+ </div><nav className={'mobile-menu '+(open?'open':'')} aria-label="Mobile navigation">{(['living','wealth','heritage','companion','transfer','contact'] as Route[]).map(r=><a href={`/${r}/`} key={r}>{routeNames[r]}</a>)}</nav></header>;
 }
-function Footer(){return <footer className="footer"><div className="container"><div className="footer-main"><div><a className="brand" href="#/home">Shepard Croft</a><p className="footer-about">Everyday help, arranged by people who know you by name.</p></div>
- {([['Living & Well-Being',['companion','accessible']],['Wealth & Infrastructure',['transfer','wealth']],['Heritage & Provisions',['grocery','vending']],['Contact',['contact']]] as [string,Route[]][]).map(([title,rs])=><div key={title} className="footer-col"><div className="footer-head">{title}</div>{rs.map(r=><a href={`#/${r}`} key={r}>{routeNames[r]}</a>)}</div>)}
+function Footer(){return <footer className="footer"><div className="container"><div className="footer-main"><div><a className="brand" href="/">Shepard Croft</a><p className="footer-about">Everyday help, arranged by people who know you by name.</p></div>
+ {([['Living & Well-Being',['companion','accessible']],['Wealth & Infrastructure',['transfer','wealth']],['Heritage & Provisions',['grocery','vending']],['Contact',['contact']]] as [string,Route[]][]).map(([title,rs])=><div key={title} className="footer-col"><div className="footer-head">{title}</div>{rs.map(r=><a href={`/${r}/`} key={r}>{routeNames[r]}</a>)}</div>)}
  </div><div className="footer-bottom">© {new Date().getFullYear()} Shepard Croft Limited · North West England <a href={`mailto:${E}`}>{E}</a></div></div></footer>}
-function Offerings(){return <div className="service-grid">{offerings.map(s=><article className="service-card" key={s.num}><div className="card-no">{s.num}</div><h3>{s.title}</h3><p>{s.description}</p><ul className="service-list">{s.items.map(([label,r])=><li key={label}><span>{label}</span><a href={`#/${r}`}>Explore →</a></li>)}</ul></article>)}</div>}
+function Offerings(){return <div className="service-grid">{offerings.map(s=><article className="service-card" key={s.num}><div className="card-no">{s.num}</div><h3>{s.title}</h3><p>{s.description}</p><ul className="service-list">{s.items.map(([label,r])=><li key={label}><span>{label}</span><a href={`/${r}/`}>Explore →</a></li>)}</ul></article>)}</div>}
 function Standard(){return <section className="section standard"><div className="container standard-grid"><div><Eyebrow>Our standard</Eyebrow><h2>A named person, a clear arrangement, a contact you can reach.</h2></div><div className="standard-copy">{[['Named people','Every request is picked up by a person on the team, and you are told who will be helping you.'],['Clear arrangements','Time, place, what is included and what is not, agreed with you before anything starts.'],['A contact you can reach','One route back to a person: an email address today, and WhatsApp when the line opens.']].map(([t,p])=><div key={t} className="standard-item"><h3>{t}</h3><p>{p}</p></div>)}</div></div></section>}
 function HowItWorks(){return <section className="section"><div className="container"><Eyebrow>How it works</Eyebrow><h2>Ask, agree the details, receive.</h2><div className="step-grid">{[['01','Ask','Tell us what you need through the form or by email. No account needed.'],['02','Agree the details','We reply with the name of the person arranging it, the details and, where relevant, a quote.'],['03','Receive','We confirm the arrangement before it begins and tell you if anything changes.']].map(([n,t,p])=><div className="step" key={n}><div className="step-no">{n}</div><h3>{t}</h3><p>{p}</p></div>)}</div></div></section>}
 function ContactBand(){return <section className="cta-dark"><div className="container contact-strip"><div><Eyebrow>Contact</Eyebrow><h2>Talk to a person.</h2><p className="lead">Write to us at <a style={{color:'white',textDecoration:'underline'}} href={`mailto:${E}`}>{E}</a>. A WhatsApp line will be added when it opens.</p><Link route="contact">Send an enquiry</Link></div><div className="contact-options">{['Companionship','Accessible transport','Airport & business transfers','Grocery market','Vending machines','Something else'].map(s=><div key={s} className="contact-choice">✓ {s}</div>)}</div></div></section>}
@@ -109,7 +109,7 @@ function Home(){return <><section className="hero"><div className="container her
  ['Heritage & Provisions','Vending site visit','Tell us about your site and we will arrange a visit to talk through what could work.','vending-form']
  ].map(([tag,t,p,r])=><article className="journey" key={t}><Eyebrow>{tag}</Eyebrow><h3>{t}</h3><p>{p}</p><div className="what">Ask, agree, receive</div><p>We will discuss your needs and respond personally.</p><Link route={r as Route} outline>Make an enquiry</Link></article>)}</div></div></section><HowItWorks/><ContactBand/></>}
 function Marketing({route}:{route:Route}){const p=details[route];if(!p)return null;
- return <><section className="page-hero"><div className="container"><div className="breadcrumb"><a href="#/home">Home</a> / {routeNames[route]}</div><div className="page-hero-grid"><div><Eyebrow>{p.eyebrow}</Eyebrow><h1>{p.title}</h1><p className="lead">{p.desc}</p><div className="btn-group">{p.actions.map(([label,r],i)=><Link route={r} outline={i>0} key={r}>{label}</Link>)}</div></div><div className="page-hero-media"><Image name={p.image} alt={p.imageAlt}/></div></div></div></section>
+ return <><section className="page-hero"><div className="container"><div className="breadcrumb"><a href="/">Home</a> / {routeNames[route]}</div><div className="page-hero-grid"><div><Eyebrow>{p.eyebrow}</Eyebrow><h1>{p.title}</h1><p className="lead">{p.desc}</p><div className="btn-group">{p.actions.map(([label,r],i)=><Link route={r} outline={i>0} key={r}>{label}</Link>)}</div></div><div className="page-hero-media"><Image name={p.image} alt={p.imageAlt}/></div></div></div></section>
  {route==='living'?<><section className="service-detail"><div className="container detail-grid"><div><Eyebrow>Here for your everyday</Eyebrow><h2>A little help. More room for life.</h2><p className="lead">A walk, a conversation or the practical things that need doing. Your companion helps you live independently, your way.</p><div className="detail-points">{['Good conversation','Practical help','Technology support','A familiar face'].map(t=><div className="detail-point" key={t}><strong>{t}</strong></div>)}</div></div><div className="feature-image"><Image name="community" alt="Two people browsing books together"/></div></div></section><HowItWorks/></>:null}
  {route==='wealth'?<section className="service-detail"><div className="container detail-grid"><div><Eyebrow>A better arrival</Eyebrow><h2>From landing to the last mile, we take care of the details.</h2><p className="lead">Meet and greet, luggage assistance, business travel, and other transfers by arrangement. Manchester, Liverpool and Leeds Bradford; other UK airports on request.</p><div className="detail-points">{['Flight tracking','Meet & greet','Door to door','Business travel'].map(t=><div className="detail-point" key={t}><strong>{t}</strong></div>)}</div></div><div className="feature-image"><Image name="airport-vehicle" alt="Travel plans laid out on a table"/></div></div></section>:null}
  {route==='heritage'?<section className="section"><div className="container"><Eyebrow>Two useful ways to serve</Eyebrow><h2>Provisions for homes, workplaces and communities.</h2><div className="service-grid"><article className="service-card"><h3>A market for everyone.</h3><p>Shop, sell and deliver through a shared grocery market.</p><Link route="grocery">Explore grocery market</Link></article><article className="service-card"><h3>Good snacks and drinks, always stocked.</h3><p>Managed vending for offices, gyms and venues.</p><Link route="vending">Explore vending</Link></article><article className="service-card"><h3>Talk to a person.</h3><p>Not sure which service fits? We can help.</p><Link route="contact">Get in touch</Link></article></div></div></section>:null}
@@ -149,9 +149,56 @@ function FormRoute({route,onDraft}:{route:Route;onDraft:(d:Draft)=>void}){
  if(type==='text'||type==='email')return <TextInput label={field.label} placeholder={field.placeholder} value={val} isRequired={field.required} onChange={v=>update(field.name,v)}/>;
  return <input type={type} id={field.name} name={field.name} value={val} required={field.required} onChange={e=>update(field.name,e.target.value)}/>;
  };
- return <section className="form-page"><div className="container"><div className="breadcrumb"><a href="#/home">Home</a> / {cfg.category} / {cfg.title}</div><div className="form-page-grid"><div className="form-description"><Eyebrow>{cfg.category}</Eyebrow><h1>{cfg.title}</h1><p className="lead">{cfg.description}</p><aside className="info-panel"><h3>{cfg.noteTitle}</h3><p>{cfg.note}</p></aside></div>
- <div className="form-card"><form onSubmit={submit}><h2>Your request</h2>{formError?<p className="form-validation show" role="alert">{formError}</p>:null}{cfg.fields.map(field=><div className="field" key={field.name}>{field.type==='text'||!field.type?<>{control(field)}{field.required&&!values[field.name]?<small className="hint">Required</small>:null}</>:<><label htmlFor={field.name}><span>{field.label}{field.required?' *':''}</span></label>{control(field)}</>}</div>)}<label className="privacy-consent"><input type="checkbox" required checked={privacyAcknowledged} onChange={e=>setPrivacyAcknowledged(e.target.checked)}/><span>I have read the privacy information and agree that Shepard Croft may use these contact details to respond to my enquiry. No appointment is booked by this form.</span></label><div className="form-actions"><Button label={submitting?'Submitting…':'Send enquiry'} variant="primary" type="submit" isDisabled={submitting}/>{formError.includes('email draft instead')?<button type="button" className="btn btn--outline" onClick={()=>go('ready')}>Open email draft →</button>:null}</div><p className="privacy-note">Your request is an enquiry, not a booking. We do not send care or medical details to the online database.</p></form></div></div></div></section>;
+ return <section className="form-page"><div className="container"><div className="breadcrumb"><a href="/">Home</a> / {cfg.category} / {cfg.title}</div><div className="form-page-grid"><div className="form-description"><Eyebrow>{cfg.category}</Eyebrow><h1>{cfg.title}</h1><p className="lead">{cfg.description}</p><aside className="info-panel"><h3>{cfg.noteTitle}</h3><p>{cfg.note}</p></aside></div>
+ <div className="form-card"><form onSubmit={submit}><h2>Your request</h2>{formError?<p className="form-validation show" role="alert">{formError}</p>:null}{cfg.fields.map(field=><div className="field" key={field.name}>{field.type==='text'||!field.type?<>{control(field)}{field.required&&!values[field.name]?<small className="hint">Required</small>:null}</>:<><label htmlFor={field.name}><span>{field.label}{field.required?' *':''}</span></label>{control(field)}</>}</div>)}<label className="privacy-consent"><input type="checkbox" required checked={privacyAcknowledged} onChange={e=>setPrivacyAcknowledged(e.target.checked)}/><span>I have read the privacy information and agree that Shepard Croft may use these contact details to respond to my enquiry. No appointment is booked by this form.</span></label><div className="form-actions"><Button label={submitting?'Submitting…':'Send enquiry'} variant="primary" type="submit" isDisabled={submitting}/>{formError.includes('email draft instead')?<button type="button" className="btn btn--outline" onClick={()=>go('ready')}>Open email draft →</button>:null}</div><p className="privacy-note">Your request is an enquiry, not a booking. We do not send care or medical details to the online database.</p>{route==='companion'&&import.meta.env.VITE_VOXEL_BOOKING_LIVE==='true'?<Link route="book-companion" outline>Check appointment availability</Link>:null}</form></div></div></div></section>;
 }
+
+function CompanionBooking(){
+  const [fields,setFields]=useState({name:'',email:'',date:'',time:''});
+  const [review,setReview]=useState<{reviewUrl:string;previewHandle:string;continuation:string}|null>(null);
+  const [approved,setApproved]=useState(false);
+  const [result,setResult]=useState<Record<string,unknown>|null>(null);
+  const [message,setMessage]=useState('');
+  const [pending,setPending]=useState(false);
+  const [key]=useState(()=>crypto.randomUUID());
+  const [commitKey]=useState(()=>crypto.randomUUID());
+  const update=(field:keyof typeof fields,value:string)=>setFields(prev=>({...prev,[field]:value}));
+  const start=async(event:React.FormEvent<HTMLFormElement>)=>{
+    event.preventDefault();setMessage('');setPending(true);
+    try{
+      const response=await fetch('/api/voxel-preview',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({...fields,idempotencyKey:key})});
+      const data=await response.json();
+      if(!response.ok||data.status!=='review_required')throw new Error('Booking is currently unavailable. Contact the team instead.');
+      if(typeof data.reviewUrl!=='string'||typeof data.previewHandle!=='string'||typeof data.continuation!=='string')throw new Error('The booking service did not return a valid review page.');
+      const trusted=new URL(data.reviewUrl);if(trusted.protocol!=='https:')throw new Error('The booking review URL is not secure.');
+      setReview(data);setApproved(false);
+    }catch(e){setMessage(e instanceof Error?e.message:'The booking service is unavailable.');}
+    finally{setPending(false);}
+  };
+  const complete=async()=>{
+    if(!review||!approved||pending)return;
+    setMessage('');setPending(true);
+    try{
+      const response=await fetch('/api/voxel-commit',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({previewHandle:review.previewHandle,continuation:review.continuation,idempotencyKey:commitKey,approvalConfirmed:true})});
+      const data=await response.json();
+      if(!response.ok)throw new Error('Unable to complete the booking. Please check with the team before trying again.');
+      setResult(data.data ?? {});
+      setMessage('VoxelBooking has returned a booking result. Check the status and receipt below.');
+    }catch(e){setMessage(e instanceof Error?e.message:'Booking could not be completed.');}
+    finally{setPending(false);}
+  };
+  return <section className="form-page"><div className="container"><div className="breadcrumb"><a href="/">Home</a> / Living &amp; Well-Being / Book a companion</div><div className="form-page-grid"><div className="form-description"><Eyebrow>Living &amp; Well-Being</Eyebrow><h1>Arrange a companion appointment</h1><p className="lead">Choose a date and time, then review all booking details and give consent on the trusted booking page before you commit.</p><aside className="info-panel"><h3>Booking is separate from enquiries</h3><p>The booking service only accepts slots it confirms as available. Do not enter medical details. Your appointment is not confirmed until VoxelBooking returns a confirmation status and receipt.</p></aside><Link route="companion" outline>Make an enquiry instead</Link></div><div className="form-card"><h2>Check an appointment</h2><form onSubmit={start}>
+   <div className="field"><label htmlFor="book-name">Your full name</label><input id="book-name" required value={fields.name} onChange={e=>update('name',e.target.value)} minLength={2} maxLength={120}/></div>
+   <div className="field"><label htmlFor="book-email">Your email</label><input id="book-email" type="email" required value={fields.email} onChange={e=>update('email',e.target.value)}/></div>
+   <div className="field"><label htmlFor="book-date">Appointment date</label><input id="book-date" type="date" required value={fields.date} onChange={e=>update('date',e.target.value)}/></div>
+   <div className="field"><label htmlFor="book-time">Appointment time</label><input id="book-time" type="time" required value={fields.time} onChange={e=>update('time',e.target.value)}/></div>
+   <Button label={pending?'Working…':'Prepare booking review'} type="submit" variant="primary" isDisabled={pending||!!review}/>
+   </form>
+   {review?<div className="info-panel"><h3>Review and approve</h3><p>Open the trusted review page, verify the date, service, price and business, and personally approve any required consent. Then return here.</p><p><a href={review.reviewUrl} target="_blank" rel="noopener noreferrer">Open secure booking review →</a></p><label className="privacy-consent"><input type="checkbox" checked={approved} onChange={e=>setApproved(e.target.checked)}/><span>I reviewed and personally approved the proposal on VoxelBooking.</span></label><button type="button" className="btn" disabled={!approved||pending||!!result} onClick={complete}>Commit approved booking</button></div>:null}
+   {message?<p role="status">{message}</p>:null}{result?<div role="status"><h3>Booking service response</h3><p>Status: {String(result.status||'not provided')}</p>{result.booking_id?<p>Booking reference: {String(result.booking_id)}</p>:null}<p>Check your VoxelBooking receipt or contact the team if the status is not confirmed. Do not submit a duplicate request.</p></div>:null}
+  </div></div></div></section>;
+}
+
 function Ready({draft}:{draft:Draft|null}){
  const [copied,setCopied]=useState(false);
  if(!draft)return <section className="ready-hero"><div className="container"><h1>No enquiry prepared yet.</h1><Link route="home">Return home</Link></div></section>;
@@ -168,7 +215,7 @@ function Ready({draft}:{draft:Draft|null}){
 export default function App(){
  const [route,setRoute]=useState<Route>(currentRoute);
  const [draft,setDraft]=useState<Draft|null>(null);
- useEffect(()=>{const update=()=>{setRoute(currentRoute());window.scrollTo(0,0)};addEventListener('hashchange',update);return()=>removeEventListener('hashchange',update)},[]);
- useEffect(()=>{document.title=`${routeNames[route]} | Shepard Croft`},[route]);
- return <Theme theme={neutralTheme}>{route==='home'?<FigmaHome/>:<><a className="skip-link" href="#content">Skip to main content</a><Navigation route={route}/><main id="content">{details[route]?<Marketing route={route}/>:route==='ready'?<Ready draft={draft}/>:<FormRoute key={route} route={route} onDraft={setDraft}/>}</main><Footer/></>}</Theme>;
+ useEffect(()=>{const update=()=>{setRoute(currentRoute());window.scrollTo(0,0)};addEventListener('popstate',update);addEventListener('hashchange',update);return()=>{removeEventListener('popstate',update);removeEventListener('hashchange',update)}},[]);
+ useEffect(()=>{document.title=route==='home'?'Shepard Croft | Companionship, Airport Transfers & Everyday Services':`${routeNames[route]} | Shepard Croft`},[route]);
+ return <Theme theme={neutralTheme}>{route==='home'?<FigmaHome/>:<><a className="skip-link" href="#content">Skip to main content</a><Navigation route={route}/><main id="content">{details[route]?<Marketing route={route}/>:route==='ready'?<Ready draft={draft}/>:route==='book-companion'?<CompanionBooking/>:<FormRoute key={route} route={route} onDraft={setDraft}/>}</main><Footer/></>}</Theme>;
 }
