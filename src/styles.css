@@ -292,3 +292,88 @@ p {color:#4e5d53;}
 .privacy-consent input {width:18px;height:18px;flex:none; accent-color:var(--sc-green);margin-top:2px}
 .form-actions {display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 .form-validation.show {display:block; border-left:3px solid #a84435; padding:10px 12px; background:#fff4f0; color:#782b24}
+
+/* Shepard Croft visual QA v1.3 — align Astryx controls with Figma's readable brand surfaces.
+   Same radius for the outer Astryx text-input wrapper and the actual native input. */
+:root {
+  --sc-field-radius: 8px;
+  --sc-field-ink: #183a2d;
+  --sc-field-border: #a8bcb0;
+  --sc-field-placeholder: #566d5e;
+}
+/* Theme primitives can inherit white foreground from their neutral theme tokens.
+   Explicitly scope dark foreground to light editorial and form surfaces. */
+.form-page,
+.form-description,
+.form-card,
+.form-card form,
+.form-page .info-panel,
+.page-hero,
+.copy-grid,
+.service-detail,
+.market-card,
+.ready-card,
+.benefit,
+.service-card,
+.journey {
+  color: var(--sc-dark);
+}
+.form-page :is(h1,h2,h3,h4),
+.form-page .field :is(label,legend,small,span),
+.form-card :is(h2,h3,legend,p),
+.form-card .privacy-consent,
+.form-card .privacy-consent span,
+.page-hero :is(h1,h2,h3,h4),
+.service-detail :is(h1,h2,h3,h4),
+.market-card :is(h2,h3),
+.ready-card :is(h1,h2,h3),
+.form-description .lead,
+.form-card .field .hint {color:var(--sc-field-ink);}
+/* Keep semantic labels readable even when Astryx injects nested wrappers. */
+.form-card .field :where(label,[class*="label"],[class*="Label"],[data-slot="label"]),
+.form-card .field :where(label,[class*="label"],[class*="Label"]) * {
+  color:var(--sc-field-ink);
+  opacity:1;
+}
+.form-card .field :where(input:not([type="checkbox"]):not([type="radio"]), textarea, select) {
+  box-sizing:border-box;
+  width:100%;
+  min-height:50px;
+  color:var(--sc-field-ink);
+  -webkit-text-fill-color:var(--sc-field-ink);
+  background:#fff;
+  border:1px solid var(--sc-field-border);
+  border-radius:var(--sc-field-radius);
+  font-family:var(--sc-sans);
+  font-size:15px;
+  font-weight:400;
+  line-height:1.4;
+  padding:13px 15px;
+  box-shadow:none;
+}
+.form-card .field :where(input,textarea)::placeholder {
+  color:var(--sc-field-placeholder);
+  -webkit-text-fill-color:var(--sc-field-placeholder);
+  opacity:1;
+}
+.form-card .field :where(input:not([type="checkbox"]):not([type="radio"]),textarea,select):focus-visible {
+  border-color:#315e46;
+  outline:3px solid #bed8c5;
+  outline-offset:1px;
+}
+/* Astryx typically rounds its TextInput shell. Ensure the nested input has
+   matching corners so the inner white rectangle does not appear square. */
+.form-card .field :is([class*="InputRoot"],[class*="inputRoot"],[class*="inputContainer"],[class*="InputContainer"],[data-slot="input-wrapper"]) {
+  border-radius:var(--sc-field-radius);
+  overflow:visible;
+}
+.form-card .field textarea {min-height:120px;resize:vertical;}
+.form-card .options label {border-radius:var(--sc-field-radius);color:var(--sc-field-ink);}
+.form-card .options :where(input[type="checkbox"],input[type="radio"]) {accent-color:#315e46;}
+.form-card .privacy-consent span {font-size:13px;line-height:1.6;}
+.form-card .form-actions button,
+.form-card button[type="submit"] {border-radius:var(--sc-field-radius);}
+.step-no {color:#45654e;}
+@media (prefers-reduced-motion: reduce){
+  .btn,.service-card,.journey {transition:none;}
+}

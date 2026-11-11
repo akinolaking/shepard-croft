@@ -104,3 +104,20 @@
  .fh-footer{padding-top:38px}
  .fh-footer-grid{grid-template-columns:360px 222px 222px 222px 1fr}
 }
+
+/* Shepard Croft v1.3: light-surface title contrast and form navigation clarity. */
+.figma-site .fh-first :is(h1,h2,h3),
+.figma-site .fh-services :is(h2,h3),
+.figma-site .fh-standard :is(h2,h3),
+.figma-site .fh-journey-steps :is(h2,h3),
+.figma-site .fh-footer :is(h2,h3),
+.figma-site .fh-footer-brand,
+.figma-site .fh-brand {color:#18382b;}
+.figma-site .fh-contact :is(h2,h3,p,strong),
+.figma-site .fh-contact .fh-eyebrow {color:#fff;}
+.figma-site .fh-contact .fh-button-light {color:#213f34;}
+.figma-site .fh-button:not(.fh-button-light),
+.figma-site .fh-nav-cta {color:#fff;}
+.figma-site .fh-services p,
+.figma-site .fh-standard p,
+.figma-site .fh-journey-steps p {color:#375648;}
