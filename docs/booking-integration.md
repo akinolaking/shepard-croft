@@ -21,3 +21,7 @@ The Neon API exists in source but is disabled by default using `SHPRD_BOOKING_RE
 8. Test double-booking, cancellation, timezones, accessibility and email receipt. Change page confirmation only on actual booking receipt.
 
 Docs: https://voxelbooking.com/docs/agent-api/book-an-appointment
+
+## Optional public booking adapter (disabled)
+
+`api/voxel-preview.js` and `api/voxel-commit.js` implement a reviewed two-step public booking flow using the documented v2 HTTP endpoints. It requires a live VoxelBooking HTTPS installation and a configured business slug and service ID. The preview endpoint returns a review URL; the customer must personally open that URL and approve the proposal, then explicitly ask for commit. VoxelBooking is authoritative and can reject a stale or unapproved handle. The adapter is OFF unless `SHPRD_VOXELBOOKING_ENABLED=true`. Do not enable without testing against the installed OpenAPI schema and approved consent language. See tests/voxel-booking.test.js for mocked contract tests; these tests are NOT a live booking.
