@@ -1,0 +1,16 @@
+{
+  "name": "shepard-croft-booking-foundation",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Backend-only draft; not a deployed Shepard Croft website",
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "1.2.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
