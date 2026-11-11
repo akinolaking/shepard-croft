@@ -1,0 +1,9 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import handler from '../api/admin-redirect.js';
+function res(){return {statusCode:200,headers:{},setHeader(k,v){this.headers[k]=v;return this},status(n){this.statusCode=n;return this},json(v){this.body=v;return this},redirect(n,to){this.statusCode=n;this.location=to;return this}}}
+function invoke(method,base){const original=process.env.VOXELBOOKING_BASE_URL;try{if(base===undefined)delete process.env.VOXELBOOKING_BASE_URL;else process.env.VOXELBOOKING_BASE_URL=base;const output=res();handler({method},output);return output;}finally{if(original===undefined)delete process.env.VOXELBOOKING_BASE_URL;else process.env.VOXELBOOKING_BASE_URL=original;}}
+test('admin without VoxelBooking fails closed rather than producing a fake login',()=>{const r=invoke('GET');assert.equal(r.statusCode,503);assert.equal(r.body.error,'booking_admin_not_configured');assert.match(r.headers['X-Robots-Tag'],/noindex/)});
+test('admin rejects malicious or insecure host values',()=>{for(const value of ['http://example.com','https://user:pass@example.com','https://example.com/foo','https://example.com?to=evil','javascript:alert(1)'])assert.equal(invoke('GET',value).statusCode,503);});
+test('admin points at VoxelBooking real /admin and never handles passwords',()=>{const r=invoke('GET','https://booking.example.com');assert.equal(r.statusCode,302);assert.equal(r.location,'https://booking.example.com/admin');assert.match(r.headers['Cache-Control'],/no-store/)});
+test('admin blocks writes',()=>{const r=invoke('POST','https://booking.example.com');assert.equal(r.statusCode,405)});

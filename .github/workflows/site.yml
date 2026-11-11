@@ -10,6 +10,10 @@ on:
       - 'package.json'
       - 'vite.config.ts'
       - 'tsconfig.json'
+      - 'scripts/**'
+      - 'seo-pages.mjs'
+      - 'vercel.json'
+      - 'index.html'
       - '.github/workflows/site.yml'
 jobs:
   test-and-build:

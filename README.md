@@ -1,15 +1,28 @@
-# Shepard Croft — Astryx website v1.1.0 (work in progress)
+# Shepard Croft — Astryx React website v1.2.0 (development preview)
 
-Revised from the source HTML/React archives previously delivered for Shepard Croft. Uses actual `@astryxdesign/core` Theme, Button and TextInput primitives with bespoke Figma-matched layouts. The Figma export is the visual specification; do not replace its styling with an unrelated design.
+Built using recovered Shepard Croft HTML versions and React/Astryx components. The original Figma screens are the visual source of truth; **design fidelity is not yet approved**.
 
-## Routes
-`#/home`, `#/living`, `#/wealth`, `#/heritage`, `#/companion`, `#/transfer`, `#/accessible`, `#/grocery`, `#/grocery-form`, `#/vending`, `#/vending-form`, `#/contact`, `#/ready`.
+## Local development
 
-## Run
-`npm ci` (after generating a lockfile in a network-enabled environment), `npm run dev`, `npm test`, `npm run build`. Note: this archive presently does not include a generated lockfile. Use `npm install` once and commit the lockfile before CI/deployment.
+- `npm install` and commit the generated lockfile before using `npm ci`.
+- `npm test` runs contract, privacy, admin-routing and SEO configuration tests.
+- `npm run build` runs TypeScript, Vite, build-time HTML SEO generation and the generated-site SEO audit.
+- `npm run seo:audit` validates `dist` after a build.
 
-## Status and privacy
-The React forms submit generic enquiries to `/api/booking-requests` and display success only after a 201 response. The API is disabled until database schema, privacy and abuse controls are reviewed. On failure, the user may explicitly open an email draft. The form does not claim a confirmed booking. VoxelBooking is not installed and requires separate PHP/MySQL hosting; see docs/booking-integration.md.
+## Website routes
 
-## Test evidence
-`npm test` checks input mappings, data minimisation, validation, mocked storage and disabled/offline API outcomes. This is NOT a live Neon/VoxelBooking end-to-end test.
+The public URLs are `/`, `/living/`, `/wealth/`, `/heritage/`, `/companion/`, `/transfer/`, `/accessible/`, `/grocery/`, `/grocery-form/`, `/vending/`, `/vending-form/` and `/contact/`. Search engines can read build-time text snapshots without JavaScript. The React app enhances the content and preserves existing Figma layouts. Legacy `#/path` links still render.
+
+Private routes `/ready/` and `/book-companion/` are noindexed. `/admin` redirects **only when** the VoxelBooking PHP/MySQL base URL is configured; otherwise it returns a secure `503`, not a fake booking dashboard.
+
+## SEO status
+
+See `docs/seo-release.md`. Unique titles, descriptions, canonicals, social image, JSON-LD, sitemap, robots and optional `llms.txt` are generated. Preview deployments and unapproved sites are **noindex** by default; enable `SEO_INDEXABLE=true` only when the approved production domain is live, and set `SEO_SITE_URL` to its canonical origin.
+
+## Booking status
+
+The generic enquiry API is deliberately disabled (`SHPRD_BOOKING_REQUESTS_ENABLED=false`) until the Neon migration, privacy and abuse controls are complete. No form should report an actual booking confirmation from Neon.
+
+VoxelBooking must be installed separately on a production-grade PHP 8.3+/MySQL 8+ host. The public booking UI is guarded by `VITE_VOXEL_BOOKING_LIVE=false` by default; its review and commit route require `SHPRD_VOXELBOOKING_ENABLED=true` and a valid installation. A customer must read and approve the trusted booking review page before commit. No real appointment has been created or tested on the user's VoxelBooking installation yet.
+
+**Production launch gates:** Figma visual sign-off, real Neon read/write tests, anti-spam and privacy checks, VoxelBooking installation and business/service config, real email delivery, appointment lifecycle and double-booking tests, accessible UI checks, Lighthouse, Search Console and Rich Results validation.

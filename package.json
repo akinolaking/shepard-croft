@@ -1,14 +1,16 @@
 {
   "name": "shepard-croft-astryx",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc --noEmit && vite build",
+    "build": "node scripts/build-assets.mjs && tsc --noEmit && vite build && node scripts/build-seo.mjs && node scripts/audit-seo.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "test": "node --test tests/*.test.js",
-    "test:unit": "node --test tests/*.test.js"
+    "test:unit": "node --test tests/*.test.js",
+    "seo:audit": "node scripts/audit-seo.mjs",
+    "predev": "node scripts/build-assets.mjs"
   },
   "dependencies": {
     "@astryxdesign/core": "0.7.4",
