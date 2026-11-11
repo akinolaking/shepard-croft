@@ -31,6 +31,7 @@ jobs:
 
   visual-browser-qa:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
     steps:
@@ -39,7 +40,7 @@ jobs:
         with:
           node-version: 22
       - run: npm install --no-audit --no-fund
-      - run: npx playwright install chromium --with-deps
+      - run: npx playwright install chromium --only-shell
       - run: npm run build
       - run: npm run qa:visual
       - name: Upload full-page and 4x4 screenshots
