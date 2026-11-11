@@ -23,17 +23,17 @@ const journeys=[
  {category:'HERITAGE & PROVISIONS', title:'Request a vending site visit',description:'Tell us about your site and we will arrange a visit to talk through what would work there.',bullets:['Type of site and location','Roughly how many people pass','Your contact details'],action:'Request a site visit',route:'vending'}
 ];
 function Action({label,route,light=false}:{label:string;route:string;light?:boolean}){
- return <a className={`fh-button${light?' fh-button-light':''}`} href={route==='home'?'/':`/${route}/`}>{label}<span aria-hidden="true">→</span></a>
+ return <a className={`fh-button${light?' fh-button-light':''}`} href={`/${route}/`}>{label}<span aria-hidden="true">→</span></a>
 }
 export default function FigmaHome(){
  const [menuOpen,setMenuOpen]=useState(false);
  return <div className="figma-site">
   <header className="fh-header"><div className="fh-wrap fh-nav">
    <a href="/" className="fh-brand">Shepard Croft</a>
-   <nav className="fh-links" aria-label="Main navigation">{nav.map(([name,route])=><a key={route} href={route==='home'?'/':`/${route}/`}>{name}</a>)}</nav>
+   <nav className="fh-links" aria-label="Main navigation">{nav.map(([name,route])=><a key={route} href={`/${route}/`}>{name}</a>)}</nav>
    <a className="fh-nav-cta" href="/contact/">Talk to the team</a>
    <button type="button" className="fh-menu-toggle" aria-label="Open menu" aria-expanded={menuOpen} aria-controls="fh-mobile-nav" onClick={()=>setMenuOpen(!menuOpen)}>Menu</button>
-  </div><nav className={`fh-mobile-nav${menuOpen?' open':''}`} id="fh-mobile-nav" aria-label="Mobile navigation">{nav.map(([name,route])=><a key={route} href={route==='home'?'/':`/${route}/`} onClick={()=>setMenuOpen(false)}>{name}</a>)}<a href="/contact/" onClick={()=>setMenuOpen(false)}>Talk to the team</a></nav></header>
+  </div><nav className={`fh-mobile-nav${menuOpen?' open':''}`} id="fh-mobile-nav" aria-label="Mobile navigation">{nav.map(([name,route])=><a key={route} href={`/${route}/`} onClick={()=>setMenuOpen(false)}>{name}</a>)}<a href="/contact/" onClick={()=>setMenuOpen(false)}>Talk to the team</a></nav></header>
   <main id="content" className="fh-main">
    <section className="fh-first"><div className="fh-wrap">
     <div className="fh-hero"><div className="fh-hero-copy"><div className="fh-eyebrow">NORTH WEST ENGLAND</div>
@@ -42,7 +42,7 @@ export default function FigmaHome(){
      <div className="fh-hero-actions"><Action label="Explore services" route="living"/><a href="/contact/" className="fh-text-link">Talk to the team<span aria-hidden="true">→</span></a></div>
     </div><img className="fh-hero-image" src={companionshipImage} alt="Two women enjoying tea together at home"/></div>
     <div className="fh-services"><div className="fh-eyebrow">WHERE TO START</div><h2>Three ways in, depending on what you need</h2>
-     <div className="fh-service-grid">{categories.map(c=><article className="fh-service-card" key={c.number}><div className="fh-card-num">{c.number}</div><h3>{c.title}</h3><p>{c.description}</p><div className="fh-card-entries">{c.items.map(([name,action,route,coming])=><div key={route} className="fh-card-entry"><div className="fh-entry-title"><strong>{name}</strong>{coming?<span className="fh-coming">Coming soon</span>:null}</div><a href={route==='home'?'/':`/${route}/`}>{action}<span aria-hidden="true">→</span></a></div>)}</div></article>)}</div>
+     <div className="fh-service-grid">{categories.map(c=><article className="fh-service-card" key={c.number}><div className="fh-card-num">{c.number}</div><h3>{c.title}</h3><p>{c.description}</p><div className="fh-card-entries">{c.items.map(([name,action,route,coming])=><div key={route} className="fh-card-entry"><div className="fh-entry-title"><strong>{name}</strong>{coming?<span className="fh-coming">Coming soon</span>:null}</div><a href={`/${route}/`}>{action}<span aria-hidden="true">→</span></a></div>)}</div></article>)}</div>
     </div></div></section>
    <section className="fh-standard"><div className="fh-wrap fh-standard-grid"><div><div className="fh-eyebrow">OUR STANDARD</div><h2>A named person, a clear<br/>arrangement, a contact<br/>you can reach.</h2></div>
     <div className="fh-standard-points"><div><h3>Named people</h3><p>Every request is picked up by a person on the team, and you are told<br/>who will be helping you.</p></div><div><h3>Clear arrangements</h3><p>Time, place, what is included and what is not, agreed with you before<br/>anything starts.</p></div><div><h3>A contact you can reach</h3><p>One route back to a person: an email address today, and WhatsApp<br/>when the line opens.</p></div></div>
