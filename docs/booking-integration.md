@@ -1,26 +1,23 @@
-# Booking integration notes (draft, not deployed)
+# Shepard Croft enquiry and booking implementation notes
 
-## Separation of concerns
+## Two distinct backends
 
-- Keep the approved Figma/Astryx React website unchanged until its original source is recovered and verified.
-- **Neon PostgreSQL** tracks generic website *enquiries*, which are not confirmed bookings. The `booking_requests` table deliberately stores no clinical notes or care assessments.
-- **VoxelBooking** (PHP 8.3+, MySQL 8+) manages actual inventory, staff availability, appointments and booking status on separate PHP-capable hosting. Do not translate MySQL schema to Neon and expect VoxelBooking to work. See https://voxelbooking.com/download.
-- VoxelBooking 1.3.x supports the public booking interface and an [embeddable widget](https://voxelbooking.com/docs/customization/embed), but the iframe's form is not the Shepard Croft Figma form. The [Agent API v2](https://voxelbooking.com/docs/agent-api/transport-and-authentication) supports reviewed booking operations and explicit customer consent. Validate the installed version and its generated schema before integrating a custom form.
+- **Neon PostgreSQL**: minimal contact/date/time enquiries only. The `POST /api/booking-requests` route stores only accepted contact information and returns `enquiry_received`, never `booking_confirmed`. It deliberately does not transmit access needs, care notes, free text, or clinical fields. Site is visually based on supplied Figma export and built on actual Astryx components.
+- **VoxelBooking**: installed independently on PHP 8.3+/MySQL 8+. It is the future source of truth for staff availability, appointment bookings, cancellations and confirmations. Neon is **not** a substitute for its MySQL database.
 
-## Current draft API
+## Current state
 
-- `POST /api/booking-requests`: accepts generic service enquiries; never claims to reserve a slot.
-- Its server-only Neon connection is read from `SHPRD_DATABASE_URL`, which Vercel's Neon integration already supplies.
-- The endpoint is **disabled by default**: `SHPRD_BOOKING_REQUESTS_ENABLED=true` is required after the migration, privacy review, anti-spam/rate-limiting controls and tests have been completed.
-- `db/migrations/001_booking_requests.sql` is **not** executed by this branch; no live database was modified.
-- No sensitive care details or open-ended clinical notes are accepted. Any future health-related data requires a separate privacy and security design.
+The Neon API exists in source but is disabled by default using `SHPRD_BOOKING_REQUESTS_ENABLED=false`. The SQL migration is *not* automatically executed. The source includes `npm test` contract tests with an injected in-memory store; they do not prove real Neon persistence or VoxelBooking confirmation.
 
-## Before live customer submissions
+## Required before enabling production
 
-1. Import the existing approved React/Astryx source and reproduce every Figma screen.
-2. Run `npm test`, test the SQL migration on a nonproduction Neon branch, and perform a real insert/readback with test-only data.
-3. Add rate limiting, spam prevention, privacy notice and data-retention policy; determine lawful basis and role-based access.
-4. Install VoxelBooking on PHP/MySQL hosting; configure business, service, timezone, staff availability and email/cron.
-5. Define and test a custom Figma-form flow using the installed VoxelBooking v2 contract, including preview, customer-controlled approval, commit receipt and retries, or use the official embedded page only where approved.
-6. Verify separate outcome states: enquiry received, booking pending, booking confirmed and cancelled.
-7. Verify production build, accessible interactions, visual regression and authenticated admin workflows before launch.
+1. Deploy site and pass Figma screenshot review and build.
+2. Complete and publish an appropriate UK privacy notice and retention policy; determine lawful basis and controller/processor arrangements, especially for special-category health information.
+3. Review anti-abuse controls: production rate limit, spam protection, alerts and access controls. Keep contact-only intake; never store clinical notes in the generic enquiries table.
+4. Apply `db/migrations/001_booking_requests.sql` on a **nonproduction** Neon branch, test rollback, execute insert/readback/delete with synthetic data; then carefully promote migration.
+5. Verify Vercel secret is server-only, run production endpoint tests and configure email notifications.
+6. Install VoxelBooking on PHP/MySQL at the root of its own HTTPS subdomain. Configure staff, service, timezone, email/cron and admin access.
+7. Use the installed VoxelBooking API `/api/agent/v2/schema`; implement and test public session → preview → customer opens `review_url` and approves → commit with idempotency key. Never auto-approve a booking.
+8. Test double-booking, cancellation, timezones, accessibility and email receipt. Change page confirmation only on actual booking receipt.
+
+Docs: https://voxelbooking.com/docs/agent-api/book-an-appointment
