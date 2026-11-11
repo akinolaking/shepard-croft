@@ -1,0 +1,26 @@
+name: Booking foundation checks
+
+on:
+  pull_request:
+    paths:
+      - "src/lib/**"
+      - "tests/**"
+      - "api/**"
+      - "package.json"
+      - ".github/workflows/booking-foundation.yml"
+  push:
+    branches: [feature/neon-booking-foundation]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npm test
+      - run: node --check api/booking-requests.js
